@@ -36,12 +36,11 @@ class Auction:
     def second_price_auction(self, bid1, bid2, val1, val2):
         # working entirely based on indexes until here
 
-        # agent1 wins
-        if bid1 > bid2:
+        if bid1 > bid2: # agent1 wins
             return self.values_states[val1] - self.actions_bids[bid2], 0
         elif bid2 > bid1: # agent2 wins
             return 0, self.values_states[val2] - self.actions_bids[bid1]
-        else:
+        else: # randomly choose a winner since they tied
             if np.random.rand() < 0.5:
                 return self.values_states[val1] - self.actions_bids[bid2], 0
             else:
