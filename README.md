@@ -48,10 +48,10 @@ You can override any of the default values using the following optional flags:
 | `--truth_max`   | Max truthfulness exploration     | `--truth_max 0.2`    |
 | `--num_points`  | Number of points for evaluation  | `--num_points 150`   |
 
-Example usage:
+Example:
 
 ```bash
-python your_script.py --mode 3 --n_agents 6 --n_episodes 60000
+python Bandit.py --mode 3 --n_agents 6 --n_episodes 60000
 ```
 
 ### Plotting
