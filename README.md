@@ -28,7 +28,7 @@ Example:
 ```bash
 python Bandit.py
 ```
-Use the `--mode` flag to select a training configuration:
+Use the `--mode` flag to select a training configuration for both discrete and continuous:
 
 | Mode Name         | Code | Description                        |
 |-------------------|------|------------------------------------|
@@ -37,6 +37,33 @@ Use the `--mode` flag to select a training configuration:
 | `multi-k-item`    | `3`  | Multiple agents, multiple items    |
 | `multi-k-adversial` | `4` | Adversarial setting                |
 
+#### Discrete RL:
+
+File to run:
+
+```bash
+python QLearning.py
+```
+
+You can override any of the default values using the following optional flags:
+
+| Flag            | Description                      | Example              |
+|-----------------|----------------------------------|----------------------|
+| `--n_agents`    | Number of agents                 | `--n_agents 5`       |
+| `--n_items`     | Number of items                  | `--n_items 3`        |
+| `--n_episodes`  | Total training episodes          | `--n_episodes 50000` |
+| `--n_state`   | Number of discrete states dividing 0.0 to 1.0     | `--n_state 11`    |
+| `--n_action`  | Number of discrete actions dividing 0.0 to 1.0 | `--n_action 11`   |
+
+Ensure that n_state and n_action are the same
+
+#### Continuous RL:
+
+Files to run
+```bash
+python Bandit.py
+python SAC.py
+```
 
 You can override any of the default values using the following optional flags:
 
