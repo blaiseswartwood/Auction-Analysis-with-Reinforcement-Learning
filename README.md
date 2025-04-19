@@ -1,6 +1,8 @@
 # Auction-Analysis-with-Reinforcement-Learning
 Analysis of Ideal Auctions using Reinforcement Learning
 
+Note: Achieving convergence can be difficult and it is easy to get stuck in local optimum. Best results will take several trials to obtain.
+
 # Discrete (Dynamic Programming) results:
 
 Second-price auction simplest case (two agents, one item):
