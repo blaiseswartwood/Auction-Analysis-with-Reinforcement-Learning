@@ -98,17 +98,24 @@ python ./plot.py . reward --smooth 10 --out BanditTReward.png
 
 ### Discrete (Dynamic Programming)
 
-1. Second-price auction simplest case (two agents, one item):
+Example: Second-price auction simplest case (two agents, one item):
 ![image](https://github.com/user-attachments/assets/1e5c4052-1630-439c-883d-b390b62397d3)
 
 
 ### Continuous (Deep RL)
 
-1. Second-price auction simplest case (two agents, one item):
+Example: Second-price auction simplest case (two agents, one item) for Bandit:
+
 ![image](https://github.com/user-attachments/assets/6b7bd7a9-fc6e-4900-b344-c88659bace58)
 
-Q Loss
+#### Q Loss
 
-Act Loss
+![BanditTLoss_Q](https://github.com/user-attachments/assets/1b44654b-4fb8-48c0-b4b0-5b59c8c9c4bc)
 
-Rewards
+#### Act Loss
+
+![BanditTLoss_Act](https://github.com/user-attachments/assets/e42bf119-b521-4010-91ce-cacffa0232da)
+
+#### Rewards
+
+![BanditTReward](https://github.com/user-attachments/assets/e65f9a52-ca4a-4d4d-9942-90a793cb64ed)
