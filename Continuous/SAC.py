@@ -8,19 +8,24 @@ from collections import deque
 import copy
 import pandas as pd
 from tqdm import tqdm
+import numpy as np
+
+from utils import select_mode, parse_args, Auction
+
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 # SAC for continuous environments
 # Values -> states
 # Actions -> bids placed
 # Rewards -> from second price auction
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 class SAC:
-    def __init__(self, n_state, n_action, act_lim_high, act_lim_low):
+    def __init__(self, act_lim_high, act_lim_low, n_state=1, n_action=1, ):
         self.act_lim_high = act_lim_high
         self.act_lim_low = act_lim_low
         self.alpha = 0.01
-        self.n_action = n_action  # save for later use
+        self.n_action = n_action
+        self.n_state = n_state
 
         # Actor network
         self.act_net = nn.Sequential(
@@ -111,45 +116,30 @@ class SAC:
             action = dist.sample().item()
         return np.clip(action, self.act_lim_low, self.act_lim_high)
 
-class Auction:
-    def __init__(self, n_state, n_action, n_agent, n_identical_items):
-        self.n_agent = n_agent
-        self.n_identical_items = n_identical_items
-
-    def second_price_auction(self, bids, values):
-        rewards = np.zeros(self.n_agent) 
-
-        bids = np.array(bids)
-        agent_indices = np.arange(len(bids))
-        np.random.shuffle(agent_indices)
-
-        sorted_indices = agent_indices[np.argsort(bids[agent_indices])[::-1]]
-        k_plus_1_price = bids[sorted_indices[self.n_identical_items]]
-
-        for x in range(self.n_identical_items):
-            winner = sorted_indices[x]
-            reward = values[winner] - k_plus_1_price
-            rewards[winner] = reward
-        return rewards
-
 if __name__ == "__main__":
-    # dimension of the state and actions
-    n_state = 1
-    n_action = 1
-
     # range of continuous actions
     act_lim_high = 1.0
     act_lim_low = 0.0
     
-    n_episodes = 20000    
-    n_agents = 2
-    n_identical_items = 1
-    record_freq = n_episodes/500
-    truth_max = 0.05
-    num_points = 100
+    args = parse_args()
+    overrides = {
+        k: v for k, v in vars(args).items()
+        if k != "mode" and v is not None
+    }
+    config = select_mode(args.mode, **overrides)
+
+    n_agents = config["n_agents"]
+    n_items = config["n_items"]
+    n_episodes = config["n_episodes"]
+    record_freq = config["record_freq"]
+    truth_max = config["truth_max"]
+    num_points = config["num_points"]
+
+    print(f"Mode: {args.mode}")
+    print(f"Agents: {n_agents}, Items: {n_items}, Episodes: {n_episodes}, Truth max: {truth_max}, Points: {num_points}")
     
-    agents = [SAC(n_state, n_action, act_lim_high, act_lim_low) for x in range(n_agents)]
-    auction = Auction(n_state, n_action, n_agents, n_identical_items)
+    agents = [SAC(act_lim_high, act_lim_low) for x in range(n_agents)]
+    auction = Auction(n_agents, n_items)
 
     reward_list = [[] for _ in range(n_agents)]
     loss_q1_list = [[] for _ in range(n_agents)]
@@ -163,7 +153,12 @@ if __name__ == "__main__":
         values = [np.random.uniform(0, 1) for _ in range(n_agents)]
 
         # Get bids from agents
-        bids = [agents[i].select_action([values[i]]) for i in range(n_agents)]
+        if args.mode == "4" or args.mode == "multi-k-adversial":
+            bids = [agents[i].select_action([values[i]]) for i in range(n_agents-2)]
+            bids.append(agents[-2].noisy_agent())
+            bids.append(agents[-1].cheating_agent(bids, n_items))
+        else:
+            bids = [agents[i].select_action([values[i]]) for i in range(n_agents)]
 
         # Rewards from auction mechanism
         rewards = auction.second_price_auction(bids, values)
@@ -190,7 +185,12 @@ if __name__ == "__main__":
             if abs(bid - v) <= truth_max:
                 truthful += 1
         print(f"Agent {i} bids truthfully in {truthful}/{num_points} sampled values.")
-
+        if args.mode == "4" or args.mode == "multi-k-adversial":
+            if x == n_agents-2:
+                print("Adversarial Noisy Agent")
+            elif x == n_agents-1:
+                print("Cheating Agent")
+                
     df = pd.DataFrame({'loss_act': loss_act_list[0], 'loss_q1': loss_q1_list[0], 'loss_q2': loss_q2_list[0], 'loss_ent': loss_ent_list[0], 'reward': reward_list[0]})
     df.to_csv("./SAC.csv",
               index=False, header=True)
