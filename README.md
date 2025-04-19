@@ -25,10 +25,20 @@ Regardless of the 'truth count' that is obtained, you can identify the general t
 
 ### Continuous (Deep RL)
 
-2. Second-price auction simplest case (two agents, one item):
-![image](https://github.com/user-attachments/assets/6b7bd7a9-fc6e-4900-b344-c88659bace58)
+To use the pyplot.py to graph, ensure you only have one excel file in the specified directory.
 
-Training results:
+Usage:
+```bash
+python your_script.py ./your_directory/ name_of_data_column --smooth 10 --out name_of_plot.png
+```
+
+Example:
+```bash
+python ./plot.py . reward --smooth 10 --out BanditTReward.png
+```
+
+1. Second-price auction simplest case (two agents, one item):
+![image](https://github.com/user-attachments/assets/6b7bd7a9-fc6e-4900-b344-c88659bace58)
 
 Q Loss
 
