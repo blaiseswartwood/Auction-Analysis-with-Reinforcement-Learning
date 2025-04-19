@@ -9,6 +9,7 @@ Analysis of Ideal Auctions using Reinforcement Learning
 pip install numpy torch pandas tqdmp
 ```
 
+## Usage:
 Note: Achieving convergence can be difficult and it is easy to get stuck in local optimum. Best results will take several trials to obtain.
 
 ## Discrete (Dynamic Programming) results:
