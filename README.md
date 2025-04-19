@@ -28,6 +28,15 @@ Example:
 ```bash
 python Bandit.py
 ```
+Use the `--mode` flag to select a training configuration:
+
+| Mode Name         | Code | Description                        |
+|-------------------|------|------------------------------------|
+| `simple`          | `1`  | Default mode with 2 agents, 1 item |
+| `multi-agent`     | `2`  | Multiple agents, 1 item            |
+| `multi-k-item`    | `3`  | Multiple agents, multiple items    |
+| `multi-k-adversial` | `4` | Adversarial setting                |
+
 
 You can override any of the default values using the following optional flags:
 
