@@ -17,8 +17,16 @@ Regardless of the 'truth count' that is obtained, you can identify the general t
 
 ### Running the code
 
+Usage:
+
 ```bash
 python file_to_run.py
+```
+
+Example:
+
+```bash
+python Bandit.py
 ```
 
 ### Plotting
