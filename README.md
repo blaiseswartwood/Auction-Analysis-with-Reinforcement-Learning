@@ -29,6 +29,15 @@ Example:
 python Bandit.py
 ```
 
+You can override any of the default values using the following optional flags:
+
+Flag	Description	Example
+--n_agents	Number of agents	--n_agents 5
+--n_items	Number of items	--n_items 3
+--n_episodes	Total training episodes	--n_episodes 50000
+--truth_max	Max truthfulness exploration	--truth_max 0.2
+--num_points	Number of points for evaluation	--num_points 150
+
 ### Plotting
 
 For the continuous (deep RL) code, to use the pyplot.py to graph, ensure you only have one excel file in the specified directory.
