@@ -8,7 +8,9 @@ from tqdm import tqdm
 # Rewards -> from second price auction
 
 class Policy:
-    def __init__(self, Q, eps, gamma = 0.0, alpha = 0.01):
+    def __init__(self, n_state, n_action, eps, gamma = 0.0, alpha = 0.01):
+        self.n_state = n_state
+        self.n_action = n_action
         self.Q = np.zeros((n_state, n_action))
         self.eps = eps
         self.gamma = gamma
@@ -28,44 +30,40 @@ class Policy:
             return np.argmax(self.Q[state])
 
 class Auction:
-    def __init__(self, n_state, n_action, n_agent, n_identical_items):
+    def __init__(self, n_state, n_action, n_agent):
         self.values_states = np.linspace(0, 1, n_state)
         self.actions_bids = np.linspace(0, 1, n_action)
         self.n_agent = n_agent
-        self.n_identical_items = n_identical_items
 
+    # define reward as internal value - price paid
     def second_price_auction(self, bids, values):
-        rewards = np.zeros(self.n_agent)
-    
-        bid_amounts = self.actions_bids[bids]
-        value_amounts = self.values_states[values]
-    
-        # Tie-breaking by shuffling before sort
-        agent_indices = np.arange(len(bid_amounts))
-        np.random.shuffle(agent_indices)
+        reward = np.zeros(self.n_agent)
 
-        # bid_amounts[agent_indicies] -> get bid amounts after shuffle
-        # np.argsort -> get back indicies to sort in descending order
-        # rearrange agent_indicies to match 
-        sorted_indices = agent_indices[np.argsort(bid_amounts[agent_indices])[::-1]]
-        k_plus_1_price = bid_amounts[sorted_indices[self.n_identical_items]]
+        bid_values = self.actions_bids[bids]
+        sorted_indices = np.argsort(bid_values)[::-1]
+        top_bid_value = bid_values[sorted_indices[0]]
+        top_bidders = np.where(bid_values == top_bid_value)[0]
 
-        for x in range(self.n_identical_items):
-            winner = sorted_indices[x]
-            reward = value_amounts[winner] - k_plus_1_price
-            rewards[winner] = reward
-    
-        return rewards
+        if len(top_bidders) == 1:
+            winner = top_bidders[0]
+            second_bid_value = bid_values[sorted_indices[1]]
+        else:
+            winner = np.random.choice(top_bidders)
+            second_bid_value = top_bid_value
+
+        value_actual = self.values_states[values[winner]]
+        reward[winner] = value_actual - second_bid_value
+
+        return reward
 
 if __name__ == "__main__":
     n_state = 11
     n_action = 11
     n_episodes = 1000000    
     n_agents = 5
-    n_identical_items = 2
 
     agents = [Policy(n_state, n_action, 1.0) for x in range(n_agents)]
-    auction = Auction(n_state, n_action, n_agents, n_identical_items)
+    auction = Auction(n_state, n_action, n_agents)
     
     for i in tqdm(range(n_episodes)):                
         # Pick random states aka values to use

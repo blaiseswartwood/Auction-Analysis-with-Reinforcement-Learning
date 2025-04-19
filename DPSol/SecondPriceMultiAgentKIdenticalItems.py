@@ -8,7 +8,9 @@ from tqdm import tqdm
 # Rewards -> from second price auction
 
 class Policy:
-    def __init__(self, Q, eps, gamma = 0.0, alpha = 0.01):
+    def __init__(self, n_state, n_action, eps, gamma = 0.0, alpha = 0.01):
+        self.n_state = n_state
+        self.n_action = n_action
         self.Q = np.zeros((n_state, n_action))
         self.eps = eps
         self.gamma = gamma
