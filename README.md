@@ -15,17 +15,15 @@ pip install numpy torch pandas tqdmp
 Note: Achieving convergence can be difficult and it is easy to get stuck in local optimum. Best results will take several trials to obtain.
 Regardless of the 'truth count' that is obtained, you can identify the general trend of the bids being close to the actual values and tending to increase over time.
 
-## Results
+### Running the code
 
-### Discrete (Dynamic Programming)
+```bash
+python file_to_run.py
+```
 
-1. Second-price auction simplest case (two agents, one item):
-![image](https://github.com/user-attachments/assets/1e5c4052-1630-439c-883d-b390b62397d3)
+### Plotting
 
-
-### Continuous (Deep RL)
-
-To use the pyplot.py to graph, ensure you only have one excel file in the specified directory.
+For the continuous (deep RL) code, to use the pyplot.py to graph, ensure you only have one excel file in the specified directory.
 
 Usage:
 ```bash
@@ -36,6 +34,15 @@ Example:
 ```bash
 python ./plot.py . reward --smooth 10 --out BanditTReward.png
 ```
+## Results
+
+### Discrete (Dynamic Programming)
+
+1. Second-price auction simplest case (two agents, one item):
+![image](https://github.com/user-attachments/assets/1e5c4052-1630-439c-883d-b390b62397d3)
+
+
+### Continuous (Deep RL)
 
 1. Second-price auction simplest case (two agents, one item):
 ![image](https://github.com/user-attachments/assets/6b7bd7a9-fc6e-4900-b344-c88659bace58)
