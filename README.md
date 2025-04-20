@@ -1,5 +1,8 @@
 # Auction-Analysis-with-Reinforcement-Learning
+
 Analysis of Ideal Auctions using Reinforcement Learning
+
+Goal: Verify that being truthful (agent bid == agent value) is optimal for agents in a second price auction.
 
 ## Setup
 
@@ -94,7 +97,7 @@ Example:
 ```bash
 python ./plot.py . reward --smooth 10 --out BanditTReward.png
 ```
-## Results
+## Sample Results
 
 ### Discrete (Dynamic Programming)
 
