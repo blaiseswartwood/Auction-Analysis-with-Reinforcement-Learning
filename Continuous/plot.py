@@ -1,3 +1,5 @@
+# This code was taken and adapted from CSSE490 Deep Reinforcement Learning from Rose-Hulman
+
 import pandas as pd
 from pandas.core.indexes.base import Index
 import seaborn as sns
@@ -6,7 +8,6 @@ import os
 import argparse
 
 sns.set_theme(style="darkgrid")
-
 
 def read_data(dir_path, y, smooth):
     dfs = []

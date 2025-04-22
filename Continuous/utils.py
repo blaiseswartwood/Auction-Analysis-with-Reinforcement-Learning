@@ -23,7 +23,8 @@ class Auction:
             winner = sorted_idx[i]
             rewards[winner] = values[winner] - price
         return rewards
-        
+
+# select_mode -> choose which mode to pick based on settings
 def select_mode(mode, **overrides):
     config = {}
     if mode == "simple" or mode == "1":

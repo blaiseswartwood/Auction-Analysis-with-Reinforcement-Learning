@@ -17,6 +17,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 # ------------------------
 # Q-network
 # ------------------------
+# Given a values and bid, return the expected return (prediction)
 class QNet(nn.Module):
     def __init__(self, state_dim, action_dim):
         super().__init__()
@@ -37,6 +38,7 @@ class QNet(nn.Module):
 # ------------------------
 # Actor network
 # ------------------------
+# Given a state, return the best action to take
 class Actor(nn.Module):
     def __init__(self, state_dim):
         super().__init__()
@@ -65,6 +67,7 @@ class BanditAgent:
     def update(self, state, action, reward):
         
         # -- Update critic -- #
+        # Straightfoward supervised learning - trying to predict the reward
         state = torch.FloatTensor(np.atleast_2d(state)).to(device)
         action = torch.FloatTensor(np.atleast_2d(action)).to(device)
         reward = torch.FloatTensor(np.atleast_2d(reward)).to(device)
@@ -77,10 +80,11 @@ class BanditAgent:
         self.qopt.step()
 
         ## -- Update actor -- #
+        # Straightforward supervised learning - trying to learn the best action to take
         bid = self.actor(state)
         pred_reward = self.qnet(state, bid)
 
-        # Optional entropy regularization to encourage exploration
+        # Entropy regularization to encourage exploration
         entropy = - (bid * torch.log(bid + 1e-8) + (1 - bid) * torch.log(1 - bid + 1e-8)).mean()
         loss_act = -pred_reward.mean() - 0.01 * entropy
 
@@ -91,12 +95,15 @@ class BanditAgent:
         return loss_q.item(), loss_act.item()
 
     def select_action(self, state, n_samples=10):
+        # Thompson Sampling - balance between exploration and exploitation
         state_tensor = torch.FloatTensor(np.atleast_2d(state)).to(device)
         sampled_actions = []
         predicted_rewards = []
 
+        # enable dropout - dropout introduces randomness, simulating sampling from a posterior over the model's predictions
         self.qnet.train()  
 
+        # generate multiple bid values and see their expected return (modeling each probability distribution)
         for _ in range(n_samples):
             bid = torch.rand((1, 1)).to(device)
             with torch.no_grad():
@@ -106,12 +113,15 @@ class BanditAgent:
 
         self.qnet.eval()  
 
+        # return the bid with the largest expected return 
         best_idx = np.argmax(predicted_rewards)
         return np.clip(sampled_actions[best_idx], 0.0, 1.0)
 
+    # just bids a set default value 
     def noisy_agent(self):
         return 0.2
 
+    # returns the bare minimum to win an item
     def cheating_agent(self, bids, n_items):
         sorted_bids = np.sort(bids)[::-1]
         if n_items < len(sorted_bids):
@@ -120,7 +130,7 @@ class BanditAgent:
             return 1.0
 
 # ------------------------
-# Main training loop
+# Main
 # ------------------------
 if __name__ == "__main__":
     args = parse_args()
@@ -147,6 +157,7 @@ if __name__ == "__main__":
     loss_q_list = [[] for _ in range(n_agents)]
     loss_act_list = [[] for _ in range(n_agents)]
 
+    # main training loop
     for ep in tqdm(range(n_episodes)):
         values = [np.random.uniform(0, 1) for _ in range(n_agents)]
         if args.mode == "4" or args.mode == "multi-k-adversial":
