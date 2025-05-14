@@ -1,5 +1,7 @@
 import numpy as np
 from tqdm import tqdm
+import matplotlib.pyplot as plt
+import pandas as pd
 
 from dp_utils import select_mode, parse_args
 # Q Learning for second price auction with two agents and one item for a discrete environment
@@ -90,7 +92,6 @@ if __name__ == "__main__":
 
     agents = [Policy(n_state, n_action, 1.0) for x in range(n_agents)]
     auction = Auction(n_state, n_action, n_agents, n_items)
-    
     for i in tqdm(range(n_episodes)):                
         # Pick random states aka values to use
         values_state = [np.random.randint(n_state) for x in range(n_agents)]
@@ -112,6 +113,8 @@ if __name__ == "__main__":
             agents[x].update(values_state[x], bids_action[x], rewards[x])
             agents[x].eps = max(0.001, agents[x].eps - decay_step)
 
+    results = []
+
     for x in range(n_agents):
         print(f"\nValue (State) -> Bid (Action) [Agent {x}]")
         truthful_matches = 0
@@ -121,6 +124,20 @@ if __name__ == "__main__":
             # Compare bid to value (rounded to index level)
             if np.abs(best_action - state) <= 0.05:
                 truthful_matches += 1
+
+            #plotting data
+            value = auction.values_states[state]
+            bid = auction.actions_bids[best_action]
+            diff = bid - value  # positive = overbid, negative = underbid
+    
+            results.append({
+                "Agent": x,
+                "State Index": state,
+                "Value": value,
+                "Best Bid": bid,
+                "Difference": diff
+            })
+            
         if args.mode == "4" or args.mode == "multi-k-adversial":
             if x == n_agents-2:
                 print("Adversarial Noisy Agent")
@@ -128,3 +145,17 @@ if __name__ == "__main__":
                 print("Cheating Agent")
         print(f"\nAgent {x} bids truthfully in {truthful_matches} out of {n_state} states.")
 
+    results = pd.DataFrame(results)
+    
+    print('plotting')
+    #plot
+    for x in range(n_agents):
+        agent_df = results[results["Agent"] == x]
+        plt.plot(agent_df["State Index"], agent_df["Difference"], label=f"Agent {x}")
+
+    plt.xlabel("Value (State Index)")
+    plt.ylabel("Truthfullness (Bid-Value, 0 is good)")
+    plt.title("Learned Policy: Bid–Value Difference per Agent")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
