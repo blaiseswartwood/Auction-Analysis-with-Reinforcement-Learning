@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 
 from utils import select_mode, parse_args, Auction
+from BidTracker import BidValueTracker
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -157,6 +158,8 @@ if __name__ == "__main__":
     loss_q_list = [[] for _ in range(n_agents)]
     loss_act_list = [[] for _ in range(n_agents)]
 
+    tracker = BidValueTracker(n_agents=n_agents)
+
     # main training loop
     for ep in tqdm(range(n_episodes)):
         values = [np.random.uniform(0, 1) for _ in range(n_agents)]
@@ -176,6 +179,8 @@ if __name__ == "__main__":
                 loss_q_list[i].append(loss_q)
                 loss_act_list[i].append(loss_act)
                 reward_list[i].append(rewards[i])
+                tracker.capture_checkpoint(agents, ep, algorithm_type="bandit")
+
 
     # ------------------------
     # Evaluation
@@ -198,3 +203,6 @@ if __name__ == "__main__":
     df = pd.DataFrame({'loss_act': loss_act_list[0], 'loss_q': loss_q_list[0], 'reward': reward_list[0]})
     df.to_csv("./Bandit.csv",
               index=False, header=True)
+    
+    tracker.create_plots(algorithm_type="bandit")
+

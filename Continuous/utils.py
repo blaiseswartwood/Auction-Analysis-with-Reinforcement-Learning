@@ -34,7 +34,7 @@ def select_mode(mode, **overrides):
             "n_episodes": 20000,
             "record_freq": 20000 / 500,
             "truth_max": 0.05,
-            "num_points": 100
+            "num_points": 11
         }
     elif mode == "multi-agent" or mode == "2":
         config = {

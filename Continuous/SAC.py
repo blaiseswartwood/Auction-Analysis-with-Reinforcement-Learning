@@ -10,6 +10,7 @@ import pandas as pd
 from tqdm import tqdm
 import numpy as np
 
+from BidTracker import BidValueTracker
 from utils import select_mode, parse_args, Auction
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -146,7 +147,10 @@ if __name__ == "__main__":
     loss_q2_list = [[] for _ in range(n_agents)]
     loss_act_list = [[] for _ in range(n_agents)]
     loss_ent_list = [[] for _ in range(n_agents)]
-    
+
+    tracker = BidValueTracker(n_agents=n_agents)
+
+
     ## -- Training Loop -- ##
     for episode in tqdm(range(n_episodes)):
         # Generate random values (states)
@@ -173,6 +177,8 @@ if __name__ == "__main__":
                 loss_act_list[i].append(loss_act)
                 loss_ent_list[i].append(loss_ent)
                 reward_list[i].append(rewards[i])
+                tracker.capture_checkpoint(agents, episode, algorithm_type="sac")
+
 
     ## -- Results -- ##
     # Print learned bidding policy
@@ -194,3 +200,4 @@ if __name__ == "__main__":
     df = pd.DataFrame({'loss_act': loss_act_list[0], 'loss_q1': loss_q1_list[0], 'loss_q2': loss_q2_list[0], 'loss_ent': loss_ent_list[0], 'reward': reward_list[0]})
     df.to_csv("./SAC.csv",
               index=False, header=True)
+    tracker.create_plots(algorithm_type="sac")
